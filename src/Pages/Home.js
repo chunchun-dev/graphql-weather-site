@@ -1,6 +1,12 @@
 import React, { useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
 import { GET_WEATHER_QUERY } from '../graphql/Queries'
+import { Box, Center, Text, Flex } from '@chakra-ui/layout'
+import { Input } from '@chakra-ui/input'
+import { Button } from '@chakra-ui/button'
+import StatBlock from '../components/StatBlock'
+import { Spinner } from '@chakra-ui/spinner'
+
 
 function Home() {
 
@@ -15,23 +21,26 @@ function Home() {
     }
 
     return (
-        <div className='home'>
-            <h1>Search for weather</h1>
-            <input type='text' placeholder='City name' value={citySearched} onChange={(e) => setCitySearched(e.target.value)}/>
-            <button onClick={()=>getWeather()}>Search</button>
+        <Box p={20} borderRadius={15} paddingTop={10} textAlign='center'>
+            <Text fontSize='4xl' lineHeight='1'>Search for weather</Text>
+            <Flex marginTop={5}>
+                <Input bg='purple.900' borderRadius={20} border='none' type='text' placeholder='City name' value={citySearched} onChange={(e) => setCitySearched(e.target.value)}/>
+                <Button onClick={()=>getWeather()} bgColor='#b90061'>Search</Button>
+            </Flex>
             {data && (
-                <div className='weather'>
+                <Box marginTop={5}>
+                    <Flex>
+                        <StatBlock statName='Temperature' stat={`${Math.round(data.getCityByName.weather.temperature.actual/10)}°C`}/>
+                        <StatBlock statName='Feels like' stat={`${(data.getCityByName.weather.temperature.feelsLike/10).toFixed(1)}°C`}/>
+                        <StatBlock statName='Clouds' stat={`${data.getCityByName.weather.clouds.all}`}/>
+                    </Flex>
+                    <h1>Description: {data.getCityByName.weather.summary.description.toUpperCase()}</h1>
 
-                    <h1>{data.getCityByName.name}</h1>
-                    <h1>{data.getCityByName.weather.temperature.actual}</h1>
-                    <h1>Description: {data.getCityByName.weather.summary.description}</h1>
-                    <h1>Wind speed: {data.getCityByName.weather.wind.speed}</h1>
-
-                </div>
+                </Box>
             )}
 
-            {loading && <h1>Loading</h1>}
-        </div>
+            {loading && <Spinner color='#b90061'/>}
+        </Box>
     )
 }
 
